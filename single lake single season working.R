@@ -37,12 +37,12 @@ theta$v2 <- v2
 theta$No <- No
 theta$rel_surv <- rel_surv
 theta$pvul_recov <- pvul_recov
-theta$cpue_base <- 5          #catch rate required for a satisfaction or utility of 1
-theta$val_power <- 2          #power function of how satisaction increases with catch rate
-theta$max_eff_wknd <- 10      #max effort possible on a weekend
-theta$max_eff_wkdy <- 10      #max effort possible on a weekday
-theta$cpue_half <- 3                #inflection point for logistic effort
-theta$sdcpue <- 5                   #sigma of logistic effort
+theta$cpue_base <- cpue_base          #catch rate required for a satisfaction or utility of 1
+theta$val_power <- val_power          #power function of how satisaction increases with catch rate
+theta$max_eff_wknd <- max_eff_wknd      #max effort possible on a weekend
+theta$max_eff_wkdy <- max_eff_wkdy      #max effort possible on a weekday
+theta$cpue_half <- cpue_half                #inflection point for logistic effort
+theta$sdcpue <- sdcpue                   #sigma of logistic effort
 
 #effort sequences
 all_open <- rep(1,unit_time)                              #open all the time

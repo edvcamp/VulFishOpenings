@@ -81,7 +81,7 @@ fun <- function(theta){
 }
 
 ii=0.5                                         #initial values
-theta=rep(log(ii/(1-ii)),unit_time/1)         #logit transformed starting values (turns .5 to 0)
+theta=rep(log(ii/(1-ii)),unit_time/12)         #logit transformed starting values (turns .5 to 0)
 fit=optim(theta, fun, method="SANN")                          #should estimate the open sequence
 fit1 = optim(fit$par, fun, method="SANN")                     #re-estimate the open sequence, using initial estimates and new starting values
 #fit2 = optim(fit1$par, fun, method="SANN")                   #can be repeated any number of times
