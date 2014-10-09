@@ -40,10 +40,10 @@ theta$recov <- recov
 theta$pvul_recov <- pvul_recov
 theta$cpue_base <- cpue_base          #catch rate required for a satisfaction or utility of 1
 theta$val_power <- val_power          #power function of how satisaction increases with catch rate
-theta$max_eff_wknd <- max_eff_wknd      #max effort possible on a weekend
-theta$max_eff_wkdy <- max_eff_wkdy      #max effort possible on a weekday
 theta$cpue_half <- cpue_half                #inflection point for logistic effort
 theta$sdcpue <- sdcpue                   #sigma of logistic effort
+theta$max_eff_wknd <- max_eff_wknd      #max effort possible on a weekend
+theta$max_eff_wkdy <- max_eff_wkdy      #max effort possible on a weekday
 
 #effort sequences
 all_open <- rep(1,unit_time)                              #open all the time
@@ -67,10 +67,10 @@ fun <- function(theta,open_seq){
   pvul_recov <- theta$pvul_recov
   cpue_base <- theta$cpue_base
   val_power <- theta$val_power
-  max_eff_wknd <- theta$max_eff_wknd
-  max_eff_wkdy <- theta$max_eff_wkdy
   cpue_half <- theta$cpue_half
   sdcpue <- theta$sdcpue
+  max_eff_wknd <- theta$max_eff_wknd
+  max_eff_wkdy <- theta$max_eff_wkdy
   surv <- exp(-M)         #survival
     
   #vectors
@@ -256,10 +256,10 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
            expression(paste(italic("p"[v]))),
            expression(paste(italic(C[0]))),
            expression(italic(beta)),
-           expression(paste(italic("E"["WE"]))),
-           expression(paste(italic("E"["WD"]))),
            expression(paste(italic("C"[50]))),
            expression(paste(italic("C"[sigma]))))
+           expression(paste(italic("E"["WE"]))),
+           expression(paste(italic("E"["WD"]))),
   axis(1,at=1:14,labels=xlabs)
   mtext("Elasticity",2,line=2.5,cex=1.5)
   mtext("Parameter",1,line=2.5,cex=1.5)
