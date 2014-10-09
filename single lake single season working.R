@@ -11,7 +11,7 @@ q  <- 0.05              #catchability
 v1 <- 2/unit_time       #exchange rate to the vulnerable pool
 v2 <- 3/unit_time       #exchange rate to the invulnerable pool
 rel_prop <- 1           #proportion released
-rel_surv <- 0.8         #release survival rate
+rel_surv <- 0.9         #release survival rate
 recov <- 0.2            #rate of recovery from the refractory pool
 pvul_recov <- 0.5       #Propotion of recovered fish that go to the vulnerable pool
 sd_obs <- .2            #standard deviation of observation error of fishers, such that greater values lead to greater divergence from perfect knowledge
@@ -30,12 +30,13 @@ cpue_half <- 3                #inflection point for logistic effort
 sdcpue <- 5                   #sigma of logistic effort
 
 theta<-list()
+theta$No <- No
 theta$M <- M
 theta$q <- q
 theta$v1 <- v1
 theta$v2 <- v2
-theta$No <- No
 theta$rel_surv <- rel_surv
+theta$recov <- recov
 theta$pvul_recov <- pvul_recov
 theta$cpue_base <- cpue_base          #catch rate required for a satisfaction or utility of 1
 theta$val_power <- val_power          #power function of how satisaction increases with catch rate
@@ -56,12 +57,13 @@ month_1 <- rep(c(1,rep(0,29)),length.out=unit_time)       #open 1 weekend day a 
 
 ### Procedure Section ###
 fun <- function(theta,open_seq){
+  No <- theta$No
   M <- theta$M
   q <- theta$q
   v1 <- theta$v1
   v2 <- theta$v2
-  No <- theta$No
   rel_surv <- theta$rel_surv
+  recov <- theta$recov
   pvul_recov <- theta$pvul_recov
   cpue_base <- theta$cpue_base
   val_power <- theta$val_power
@@ -212,8 +214,9 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
 
 "Sens.Analysis" <- function()
 {
-  elast<-array(dim=c(6,length(theta),2))
-  for( i in 1:length(theta))
+  l<-length(theta)
+  elast<-array(dim=c(6,l,2))
+  for( i in 1:l)
   {
     op1 = fun(theta, open_seq=all_open)$tot_val
     op2 = fun(theta, open_seq=week_2)$tot_val
@@ -237,16 +240,27 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
     elast[5,i,2] = (fun(theta2, open_seq=twoweek_1)$tot_val-op5)/op5
     elast[6,i,2] = (fun(theta2, open_seq=month_1)$tot_val-op6)/op6
   }
-  plot(1:13,elast[5,,1],pch=6,ylab="",xlab="",xaxt="n",yaxt="n")
-  points(1:13,elast[5,,2],pch=2)
+  plot(1:l,elast[5,,1],pch=6,ylab="",xlab="",xaxt="n",yaxt="n")
+  points(1:l,elast[5,,2],pch=2)
+  for(j in 1:l)
+    lines(rep(j,2),elast[5,j,1:2],lty=3)
   axis(2,at=seq(-0.2,0.3,0.1),labels=T)
   abline(h=0,lty=2,lwd=2)
-  xlabs<-c(expression(italic("M")),expression(italic("q")),expression(paste(italic("v"[1]))),
-           expression(paste(italic("v"[2]))),expression(paste(italic("N"[0]))),expression(paste(italic("S"[r]))),
-           expression(paste(italic("p"[r]))),expression(paste(italic(C[0]))),
-           expression(italic(beta)),expression(paste(italic("E"["M,WE"]))),expression(paste(italic("E"["M,WD"]))),
-           expression(paste(italic("C"[50]))),expression(paste(italic("C"[sigma]))))
-  axis(1,at=1:13,labels=xlabs)
+  xlabs<-c(expression(paste(italic("N"[0]))),
+           expression(italic("M")),
+           expression(italic("q")),
+           expression(paste(italic("v"[1]))),
+           expression(paste(italic("v"[2]))),
+           expression(paste(italic("S"[r]))),
+           expression(paste(italic("v"[r]))),
+           expression(paste(italic("p"[v]))),
+           expression(paste(italic(C[0]))),
+           expression(italic(beta)),
+           expression(paste(italic("E"["WE"]))),
+           expression(paste(italic("E"["WD"]))),
+           expression(paste(italic("C"[50]))),
+           expression(paste(italic("C"[sigma]))))
+  axis(1,at=1:14,labels=xlabs)
   mtext("Elasticity",2,line=2.5,cex=1.5)
   mtext("Parameter",1,line=2.5,cex=1.5)
 }

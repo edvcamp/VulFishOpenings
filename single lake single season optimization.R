@@ -11,7 +11,7 @@ q  <- 0.05              #catchability
 v1 <- 2/unit_time       #exchange rate to the vulnerable pool
 v2 <- 3/unit_time       #exchange rate to the invulnerable pool
 rel_prop <- 1           #proportion released
-rel_surv <- 0.8         #release survival rate
+rel_surv <- 0.9         #release survival rate
 recov <- 0.2            #rate of recovery from the refractory pool
 pvul_recov <- 0.5       #Propotion of recovered fish that go to the vulnerable pool
 surv <- exp(-M)         #survival
