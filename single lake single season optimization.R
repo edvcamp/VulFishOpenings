@@ -16,7 +16,7 @@ recov <- 0.2            #rate of recovery from the refractory pool
 pvul_recov <- 0.5       #Propotion of recovered fish that go to the vulnerable pool
 surv <- exp(-M)         #survival
 sd_obs <- .2            #standard deviation of observation error of fishers, such that greater values lead to greater divergence from perfect knowledge
-cpue_base <- 5          #catch rate required for a satisfaction or utility of 1
+cpue_base <- 0.5          #catch rate required for a satisfaction or utility of 1
 val_power <- 2          #power function of how satisaction increases with catch rate
 max_eff_wknd <- 10      #max effort possible on a weekend
 max_eff_wkdy <- 10      #max effort possible on a weekday
@@ -138,7 +138,7 @@ fun1 <- function(theta){
       alive[i] = vul[i]+invul[i]+refract[i]
       eff_cum[i] = eff_cum[i-1]+effort[i]                                       #modified from Carl's sheet, I think this makes more sense
       cpue[i] = ifelse(effort[i]>0,catch[i]/effort[i],0)
-      value[i] = effort[i]*(cpue[i]/cpue_base)^val_power
+      value[i] = effort[i]*max(cpue[i]/cpue_base-1)^val_power
   }
   avg_cpue <- mean(cpue[which(effort>0)])                                          #average cpue where effort>0,
   avg_cpue_x_100 <- (mean(cpue[which(effort>0)]))*100                              #*100 to make plotting easier

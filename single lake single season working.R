@@ -16,8 +16,8 @@ recov <- 0.2            #rate of recovery from the refractory pool
 pvul_recov <- 0.5       #Propotion of recovered fish that go to the vulnerable pool
 sd_obs <- .2            #standard deviation of observation error of fishers, such that greater values lead to greater divergence from perfect knowledge
 
-cpue_base <- 5          #catch rate required for a satisfaction or utility of 1
-val_power <- 2          #power function of how satisaction increases with catch rate
+cpue_base <- 0.5          #catch rate required for a satisfaction or utility of 1
+val_power <- 1.5          #power function of how satisaction increases with catch rate
 #scrap code for picturing alternative value functions
 #y=seq(0,10, length=100)
 #sat=(y/cpue_base)^val_power
@@ -118,7 +118,7 @@ fun <- function(theta,open_seq){
       alive[i] = vul[i]+invul[i]+refract[i]
       eff_cum[i] = eff_cum[i-1]+effort[i]                                       #modified from Carl's sheet, I think this makes more sense
       cpue[i] = ifelse(effort[i]>0,catch[i]/effort[i],0)
-      value[i] = effort[i]*(cpue[i]/cpue_base)^val_power
+      value[i] = effort[i]*max(0,cpue[i]/cpue_base-1)^val_power
   }
   avg_cpue <- mean(cpue[which(effort>0)])                                          #average cpue where effort>0,
   avg_cpue_x_100 <- (mean(cpue[which(effort>0)]))*100                              #*100 to make plotting easier
@@ -216,6 +216,7 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
 {
   l<-length(theta)
   elast<-array(dim=c(6,l,2))
+  theta$val_pow=1.0
   for( i in 1:l)
   {
     op1 = fun(theta, open_seq=all_open)$tot_val
@@ -240,11 +241,12 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
     elast[5,i,2] = (fun(theta2, open_seq=twoweek_1)$tot_val-op5)/op5
     elast[6,i,2] = (fun(theta2, open_seq=month_1)$tot_val-op6)/op6
   }
-  plot(1:l,elast[5,,1],pch=6,ylab="",xlab="",xaxt="n",yaxt="n")
+  theta$val_pow=1.5
+  plot(1:l,elast[5,,1],pch=6,ylab="",xlab="",xaxt="n",yaxt="n",ylim=c(-0.3,0.3))
   points(1:l,elast[5,,2],pch=2)
   for(j in 1:l)
     lines(rep(j,2),elast[5,j,1:2],lty=3)
-  axis(2,at=seq(-0.2,0.3,0.1),labels=T)
+  axis(2,at=seq(-0.3,0.3,0.15),labels=seq(-0.3,0.3,0.15))
   abline(h=0,lty=2,lwd=2)
   xlabs<-c(expression(paste(italic("N"[0]))),
            expression(italic("M")),
@@ -257,9 +259,9 @@ mtext("Scenario",1,font=2,cex=1,line=2.5)
            expression(paste(italic(C[0]))),
            expression(italic(beta)),
            expression(paste(italic("C"[50]))),
-           expression(paste(italic("C"[sigma]))))
+           expression(paste(italic("C"[sigma]))),
            expression(paste(italic("E"["WE"]))),
-           expression(paste(italic("E"["WD"]))),
+           expression(paste(italic("E"["WD"]))))
   axis(1,at=1:14,labels=xlabs)
   mtext("Elasticity",2,line=2.5,cex=1.5)
   mtext("Parameter",1,line=2.5,cex=1.5)
