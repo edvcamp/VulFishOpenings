@@ -54,7 +54,7 @@ fun <- function(theta){
   refract_surv[1] = (refract[1] + catch[1]*rel_prop*rel_surv)*surv
   alive = vul[1]+invul[1]+refract[1]
   cpue[1] = ifelse(effort[1]>0,catch[1]/effort[1],0)
-  value[1] = effort[1]*(cpue[1]/cpue_base)^val_power
+  value[1] = effort[1]*max(0,cpue[1]/cpue_base-1)^val_power
   
   #time dynamic values
   for(i in 2:length(day)){
@@ -71,7 +71,7 @@ fun <- function(theta){
       alive[i] = vul[i]+invul[i]+refract[i]
       eff_cum[i] = eff_cum[i-1]+effort[i]                                       #modified from Carl's sheet, I think this makes more sense
       cpue[i] = ifelse(effort[i]>0,catch[i]/effort[i],0)
-      value[i] = effort[i]*(cpue[i]/cpue_base)^val_power
+      value[i] = effort[i]*max(0,cpue[i]/cpue_base-1)^val_power
   }
   avg_cpue <- mean(cpue[which(effort>0)])                                          #average cpue where effort>0,
   avg_cpue_x_100 <- (mean(cpue[which(effort>0)]))*100                              #*100 to make plotting easier
