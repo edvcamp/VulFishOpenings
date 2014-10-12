@@ -187,7 +187,8 @@ mtext("Days", side=1, line=3, cex=1.5, outer=F)
 plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,300), xlab="", ylab="",  yaxt ="n", main="1 day/month")
 
 
-#Compare 1 day/wk with all open
+#Compare 1 day/wk with all open in terms of dynamic changes in abundance, 
+#effort, cpue and satisfaction
 "Compare.plots" <- function()
 {
   par(mar=c(1,1,2,1),oma=c(4,4,1,4))
@@ -219,7 +220,7 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   mtext("Time (d)",1,cex=1.2,line=3.5)
 }
 
-#plots response metrics
+#plots response metrics across all opening schedules
 "Response.metrics" <- function()
 {
   par(mar=c(2,2.5,2,2.5),oma=c(2,2,1,0))
@@ -240,6 +241,8 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   mtext("Scenario",1,font=2,cex=1,line=2.5)
 }
 
+#returns table of total value for all open and 1 day per week options when
+#there is and is not vulnerable exchange dynamics
 "No.Exchange" <- function()
 {
   op1 = fun(theta, open_seq=all_open)
@@ -260,45 +263,39 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   return(resp)
 }
 
-"Satis.exponent" <- function()
-{
-  op1 = fun(theta, open_seq=all_open)
-  op3 = fun(theta, open_seq=week_1)
-  
-  resp <- matrix(nrow=4,ncol=4)
-  resp[,3]<-c(op1$tot_catch,op1$tot_effort,op1$avg_cpue,op1$tot_val)
-  resp[,4]<-c(op3$tot_catch,op3$tot_effort,op3$avg_cpue,op3$tot_val)
-  theta2<-theta
-  theta2$v1<-1
-  theta2$v2<-0
-  theta2$pvul_recov<-1
-  theta2$recov<-0.2
-  op1b = fun(theta2, open_seq=all_open)
-  op3b = fun(theta2, open_seq=week_1)
-  resp[,1]<-c(op1b$tot_catch,op1b$tot_effort,op1b$avg_cpue,op1b$tot_val)
-  resp[,2]<-c(op3b$tot_catch,op3b$tot_effort,op3b$avg_cpue,op3b$tot_val)
-  return(resp)
-}
-
+#compare value for all opening schedules across different values of beta
+#(the power parameter of the satisfaction function)
 "Response.to.beta" <- function()
 {
-  names=list()
-  out.names[[1]]<-c(expression(paste(beta,"=0.5")),expression(paste(beta,"=1.0")),expression(paste(beta,"=1.5")))
-  out.names[[2]]<-c("Catch","Effort","CPUE","Value")
-  val.tab<-matrix(nrows=3,ncol=4,dimnames=out.names)
-  
-  par(mar=c(2,2.5,2,2.5),oma=c(2,2,1,0))
-  layout(matrix(c(1:3),1,3,byrow=T))
-  legend("topright",legend=c("All open","2 days/week","1 day/week","2 days/2 weeks","1 day/2 weeks","1 day/month"),bty="n",lty=0,pch=49:54,pt.cex=1.3)#,title="Scenarios")
-  barplot(c(op1$avg_cpue,op2$avg_cpue,op3$avg_cpue,op4$avg_cpue,op5$avg_cpue,op6$avg_cpue),main="Catch-per-unit effort",names.arg=1:6)
-  mtext("Catch-per-unit-effort",2,line=3.5)
-  mtext(expression(paste("(Fish "^{.}," d"^{-1},")")),2,line=2.2,cex=0.9)
-  barplot(c(op1$tot_val,op2$tot_val,op3$tot_val,op4$tot_val,op5$tot_val,op6$tot_val),main="Value",names.arg=1:6)
-  mtext("Value (AD)",2,line=2.2)
-  par(mfcol=c(1,1))
-  mtext("Scenario",1,font=2,cex=1,line=2.5)
+  out.names=list()
+  out.names[[1]]<-c("All open","2 days/week","1 day/week","2 days/2 weeks","1 day/2 weeks","1 day/month")
+  out.names[[2]]<-c(expression(paste(beta,"=0.5")),expression(paste(beta,"=1.0")),expression(paste(beta,"=1.5")))
+  val.tab<-matrix(nrow=6,ncol=3)#,dimnames=out.names)
+  theta2<-theta
+  op1<-list()
+  op2<-list()
+  op3<-list()
+  op4<-list()
+  op5<-list()
+  op6<-list()
+  betas<-c(0.5,1,1.5)
+  for(i in 1:3)
+  {  
+    theta2$val_power<-betas[i]
+    val.tab[1,i]<-fun(theta2, open_seq=all_open)$tot_val
+    val.tab[2,i]<-fun(theta2, open_seq=week_2)$tot_val
+    val.tab[3,i]<-fun(theta2, open_seq=week_1)$tot_val
+    val.tab[4,i]<-fun(theta2, open_seq=twoweek_2)$tot_val
+    val.tab[5,i]<-fun(theta2, open_seq=twoweek_1)$tot_val
+    val.tab[6,i]<-fun(theta2, open_seq=month_1)$tot_val
+  }  
+  barplot(val.tab,beside=TRUE,density=20,angle=seq(0,150,30),names.arg=out.names[[2]])
+  mtext("Value (AD)",2,line=3,cex=1.3)
+  legend("topleft",legend=out.names[[1]],bty="n",density=20,angle=seq(0,150,30))
 }
 
+#Elasticity of the model-calculated total value to variation in each of 
+#the parameters
 "Sens.Analysis" <- function()
 {
   l<-length(theta)
@@ -354,6 +351,7 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   mtext("Parameter",1,line=2.5,cex=1.5)
 }
 
+#example plot of how satisfaction changes with different values of beta
 "Value.plot" <- function()
 {
   plot(seq(0,5,0.001),(seq(0,5,0.001)/cpue_base-1)^1,t="l",ylim=c(0,5),xaxs="i",yaxs="i",xlab="",ylab="")
@@ -368,6 +366,7 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   mtext(expression(bold(paste("CPUE (fish "^{.}," AD"^{-1},")"))),1,cex=1.25,line=2.75)
 }
 
+#value of all open and 1 day/wk schedules across a range of effort
 "Sens.to.E" <- function()
 {
   theta2<-theta
@@ -382,7 +381,7 @@ plot(op6$day, op6$effort, type="l", col="black", lwd=2, ylim=c(0,10), xlim=c(0,3
   plot(val.vec[,2],t="l",yaxt="n",ylab="",xlab="",ylim=c(1000,4000),lwd=2,cex.axis=1.2)
   lines(val.vec[,1],col="grey",lwd=2)
   axis(2,at=seq(1000,4000,500),labels=T,cex.axis=1.2)
-  mtext("Maximum daily effort (AD)",1,cex=1.5,line=2.5)
-  mtext("Value (AD)",2,cex=1.5,line=3)
+  mtext(expression(paste("Maximum daily effort (AD "^{.}," ha"^{-1},")")),1,cex=1.5,line=2.5)
+  mtext(expression(paste("Value (AD "^{.}," ha"^{-1},")")),2,cex=1.5,line=2.5)
   legend(x=45,y=3500,legend=c("All open","1 day/week"),col=c("grey","black"),lwd=2,bty="n",lty=1,cex=1.2)
 }
